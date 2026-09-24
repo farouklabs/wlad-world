@@ -211,6 +211,45 @@
       text-underline-offset:4px;
     }
 
+
+
+    .signup{
+      display:none;
+      margin-top:1.8rem;
+    }
+    .signup.visible{display:block;}
+    .email-line{
+      display:flex;
+      align-items:baseline;
+      flex-wrap:wrap;
+      gap:.55rem;
+    }
+    .email-input{
+      width:min(29ch,72vw);
+      border:0;
+      border-bottom:1px solid rgba(23,23,23,.55);
+      border-radius:0;
+      outline:none;
+      background:transparent;
+      color:var(--ink);
+      padding:.1rem .2rem .15rem;
+      font:inherit;
+      letter-spacing:.025em;
+      caret-color:var(--red);
+    }
+    .email-input:focus{border-bottom-color:var(--red);}
+    .submit{
+      appearance:none;border:0;background:none;color:var(--ink);
+      padding:0;margin-top:1.2rem;font:inherit;font-weight:700;
+      letter-spacing:.06em;cursor:pointer;
+    }
+    .submit:hover,.submit:focus-visible{
+      color:var(--red);text-decoration:underline;text-underline-offset:4px;
+    }
+    .submit:disabled{opacity:.55;cursor:wait;}
+    .signup-message{display:none;margin-top:1.8rem;}
+    .signup-message.visible{display:block;}
+
     .glitch{
       animation:glitch .16s linear 1;
     }
@@ -312,6 +351,16 @@
 
           <a id="notify" class="notify" href="#">[ GET NOTIFIED ]</a>
 
+          <form id="signup" class="signup" novalidate>
+            <label class="email-line" for="email">
+              <span>&gt; ENTER EMAIL:</span>
+              <input id="email" class="email-input" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" required>
+            </label>
+            <button id="submit-email" class="submit" type="submit">[ SUBMIT ]</button>
+          </form>
+
+          <div id="signup-message" class="signup-message" role="status" aria-live="polite"></div>
+
           <div class="logo-row">
             <img class="wlad-logo" src="logo-distressed.png" alt="WLAD">
           </div>
@@ -330,6 +379,10 @@
     const firstScreen = document.getElementById("first-screen");
     const secondScreen = document.getElementById("second-screen");
     const notify = document.getElementById("notify");
+    const signup = document.getElementById("signup");
+    const emailInput = document.getElementById("email");
+    const submitEmail = document.getElementById("submit-email");
+    const signupMessage = document.getElementById("signup-message");
 
     const BAR_LENGTH = 20;
     const LOAD_TIME = 3800;
@@ -435,8 +488,47 @@
     });
 
     notify.addEventListener("click",event=>{
-      if(notify.getAttribute("href")==="#"){
-        event.preventDefault();
+      event.preventDefault();
+      notify.style.display="none";
+      signup.classList.add("visible");
+      setTimeout(()=>emailInput.focus(),0);
+    });
+
+    signup.addEventListener("submit",async event=>{
+      event.preventDefault();
+
+      const email = emailInput.value.trim().toLowerCase();
+
+      if(!email || !emailInput.validity.valid){
+        signupMessage.innerHTML="&gt; INVALID EMAIL.<br>&gt; TRY AGAIN.";
+        signupMessage.classList.add("visible");
+        emailInput.focus();
+        return;
+      }
+
+      submitEmail.disabled=true;
+      submitEmail.textContent="[ TRANSMITTING... ]";
+      signupMessage.classList.remove("visible");
+
+      try{
+        const response=await fetch("/api/subscribe",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({email})
+        });
+
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok) throw new Error(data.error||"Subscription failed.");
+
+        signup.style.display="none";
+        signupMessage.innerHTML="&gt; EMAIL RECEIVED.<br>&gt; YOU'LL KNOW WHEN THE WORLD IS READY.";
+        signupMessage.classList.add("visible");
+      }catch(error){
+        signupMessage.innerHTML="&gt; CONNECTION FAILED.<br>&gt; TRY AGAIN.";
+        signupMessage.classList.add("visible");
+        submitEmail.disabled=false;
+        submitEmail.textContent="[ SUBMIT ]";
+        emailInput.focus();
       }
     });
 
