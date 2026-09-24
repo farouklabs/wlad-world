@@ -81,6 +81,7 @@
     .brand {
       margin: 0 0 2rem;
       font-weight: 700;
+      color: var(--red);
       letter-spacing: .08em;
     }
 
@@ -106,10 +107,19 @@
       vertical-align: bottom;
     }
 
+    #bar-filled {
+      color: var(--red);
+    }
+
+    #bar-empty {
+      color: var(--muted);
+    }
+
     .percent {
       display: inline-block;
       min-width: 4ch;
       text-align: right;
+      color: var(--ink);
     }
 
     .reveal {
@@ -280,7 +290,7 @@
         <p class="line">LOADING WLAD.WORLD</p>
 
         <div class="loader-wrap" aria-label="Loading WLAD.WORLD">
-          <span id="bar" class="bar">░░░░░░░░░░░░░░░░░░░░</span>
+          <span id="bar" class="bar"><span id="bar-filled"></span><span id="bar-empty">░░░░░░░░░░░░░░░░░░░░</span></span>
           <span id="percent" class="percent">0%</span>
         </div>
 
@@ -318,6 +328,8 @@
 
   <script>
     const bar = document.getElementById("bar");
+    const barFilled = document.getElementById("bar-filled");
+    const barEmpty = document.getElementById("bar-empty");
     const percent = document.getElementById("percent");
     const afterLoad = document.getElementById("after-load");
     const locationEl = document.getElementById("location");
@@ -332,7 +344,8 @@
     function drawBar(progress) {
       const filled = Math.round((progress / 100) * BAR_LENGTH);
       const empty = BAR_LENGTH - filled;
-      bar.textContent = "█".repeat(filled) + "░".repeat(empty);
+      barFilled.textContent = "█".repeat(filled);
+      barEmpty.textContent = "░".repeat(empty);
       percent.textContent = progress + "%";
     }
 
