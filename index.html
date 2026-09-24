@@ -1,285 +1,288 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f1efe8" />
-  <meta name="robots" content="index,follow" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f1e9">
   <title>WLAD.WORLD</title>
 
   <style>
-    :root {
-      --paper: #f1efe8;
-      --ink: #11110f;
-      --muted: #6f6d66;
-      --red: #a20d0d;
+    :root{
+      --paper:#f4f1e9;
+      --ink:#171717;
+      --red:#b00000;
     }
 
-    * { box-sizing: border-box; }
+    *{box-sizing:border-box}
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background: var(--paper);
-      color: var(--ink);
+    html,body{
+      margin:0;
+      width:100%;
+      min-height:100%;
+      background:var(--paper);
+      color:var(--ink);
     }
 
-    body {
-      min-height: 100svh;
-      overflow: hidden;
-      font-family: "Courier New", Courier, monospace;
-      -webkit-font-smoothing: none;
-      text-rendering: geometricPrecision;
+    body{
+      min-height:100svh;
+      overflow:hidden;
+      font-family:"Courier New",Courier,monospace;
+      -webkit-font-smoothing:antialiased;
     }
 
-    /* Very subtle aged/digital texture */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .18;
+    /* subtle paper/terminal texture */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:20;
+      opacity:.13;
       background:
         repeating-linear-gradient(
           to bottom,
-          rgba(0,0,0,.035) 0px,
-          rgba(0,0,0,.035) 1px,
+          rgba(0,0,0,.025) 0,
+          rgba(0,0,0,.025) 1px,
           transparent 1px,
           transparent 4px
         );
-      mix-blend-mode: multiply;
-      z-index: 20;
     }
 
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .16;
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:19;
+      opacity:.09;
       background-image:
-        radial-gradient(rgba(0,0,0,.16) .55px, transparent .65px);
-      background-size: 5px 5px;
-      z-index: 19;
+        radial-gradient(rgba(0,0,0,.16) .5px,transparent .65px);
+      background-size:5px 5px;
     }
 
-    main {
-      min-height: 100svh;
-      width: 100%;
-      display: grid;
-      place-items: center;
-      padding: clamp(22px, 5vw, 72px);
+    main{
+      min-height:100svh;
+      display:grid;
+      place-items:center;
+      padding:32px;
     }
 
-    .terminal {
-      width: min(760px, 100%);
-      font-size: clamp(13px, 1.55vw, 17px);
-      line-height: 1.55;
-      letter-spacing: .025em;
+    .terminal{
+      width:min(760px,100%);
+      font-size:clamp(13px,1.2vw,17px);
+      line-height:1.55;
+      letter-spacing:.025em;
     }
 
-    .brand {
-      margin: 0 0 2rem;
-      font-weight: 700;
-      color: var(--red);
-      letter-spacing: .08em;
+    .brand{
+      margin:0 0 2rem;
+      color:var(--red);
+      font-weight:700;
+      letter-spacing:.10em;
     }
 
-    .line {
-      margin: 0;
-      min-height: 1.55em;
+    .line{margin:0;min-height:1.55em}
+
+    .loader-wrap{
+      display:flex;
+      align-items:baseline;
+      gap:.7rem;
+      white-space:nowrap;
+      margin-top:.05rem;
     }
 
-    .loader-wrap {
-      margin-top: .05rem;
-      white-space: nowrap;
-      display: flex;
-      align-items: baseline;
-      gap: .65rem;
-      max-width: 100%;
+    .bar{
+      display:inline-block;
+      width:20ch;
+      max-width:55vw;
+      overflow:hidden;
+      letter-spacing:0;
+      color:var(--red);
     }
 
-    .bar {
-      display: inline-block;
-      width: min(20ch, 52vw);
-      letter-spacing: 0;
-      overflow: hidden;
-      vertical-align: bottom;
+    .percent{
+      display:inline-block;
+      min-width:4ch;
+      text-align:right;
     }
 
-    #bar-filled {
-      color: var(--red);
+    .after-load{
+      opacity:0;
+      transform:translateY(3px);
+      transition:opacity .2s linear,transform .2s linear;
     }
 
-    #bar-empty {
-      color: var(--muted);
+    .after-load.visible{
+      opacity:1;
+      transform:none;
     }
 
-    .percent {
-      display: inline-block;
-      min-width: 4ch;
-      text-align: right;
-      color: var(--ink);
-    }
+    .meta,.welcome{margin-top:2rem}
 
-    .reveal {
-      opacity: 0;
-      transform: translateY(3px);
-      transition: opacity .22s linear, transform .22s linear;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .meta {
-      margin-top: 2rem;
-    }
-
-    .welcome {
-      margin-top: 2rem;
-    }
-
-    .enter {
-      appearance: none;
-      border: 0;
-      background: transparent;
-      color: inherit;
-      font: inherit;
-      font-weight: 700;
-      letter-spacing: .06em;
-      padding: 0;
-      margin-top: 1.65rem;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .enter::after {
-      content: "█";
-      margin-left: .55rem;
-      animation: blink .8s steps(1) infinite;
-      color: var(--red);
+    .enter{
+      appearance:none;
+      border:0;
+      background:none;
+      color:var(--ink);
+      padding:0;
+      margin-top:1.65rem;
+      font:inherit;
+      font-weight:700;
+      letter-spacing:.07em;
+      cursor:pointer;
     }
 
     .enter:hover,
-    .enter:focus-visible {
-      text-decoration: underline;
-      text-underline-offset: 4px;
+    .enter:focus-visible{
+      color:var(--red);
+      text-decoration:underline;
+      text-underline-offset:4px;
     }
 
-    .enter:focus-visible {
-      outline: 1px dashed var(--ink);
-      outline-offset: 7px;
+    /* WLAD logo stamp */
+    .stamp{
+      position:fixed;
+      z-index:4;
+      width:clamp(150px,13vw,205px);
+      height:auto;
+      pointer-events:none;
+      opacity:0;
+      filter:contrast(1.04) saturate(1.05);
     }
 
-    .screen {
-      transition: opacity .16s linear, filter .16s linear;
+    .stamp.first{
+      top:12vh;
+      right:9vw;
+      transform:rotate(-7deg);
     }
 
-    .screen.exit {
-      opacity: 0;
-      filter: blur(2px);
+    .stamp.second{
+      right:9vw;
+      bottom:9vh;
+      width:clamp(165px,14vw,220px);
+      transform:rotate(6deg);
     }
 
-    #second-screen {
-      display: none;
+    .stamp.first.show{animation:stampFirst .38s steps(2,end) forwards}
+    .stamp.second.show{animation:stampSecond .38s steps(2,end) forwards}
+
+    @keyframes stampFirst{
+      0%{opacity:0;transform:translate(8px,-5px) rotate(-10deg) scale(.82)}
+      48%{opacity:1;transform:translate(-3px,2px) rotate(-5deg) scale(1.05)}
+      100%{opacity:1;transform:rotate(-7deg) scale(1)}
     }
 
-    #second-screen.active {
-      display: block;
-      animation: arrive .28s linear both;
+    @keyframes stampSecond{
+      0%{opacity:0;transform:translate(-8px,5px) rotate(9deg) scale(.82)}
+      48%{opacity:1;transform:translate(3px,-2px) rotate(4deg) scale(1.05)}
+      100%{opacity:1;transform:rotate(6deg) scale(1)}
     }
 
-    .soon {
-      margin-top: 3.2rem;
+    .screen{
+      transition:opacity .16s linear,filter .16s linear;
     }
 
-    .soon h1 {
-      font: inherit;
-      font-weight: 700;
-      margin: 0 0 1rem;
-      letter-spacing: .045em;
+    .screen.exit{
+      opacity:0;
+      filter:blur(2px);
     }
 
-    .soon p {
-      margin: .3rem 0;
+    #second-screen{display:none}
+
+    #second-screen.active{
+      display:block;
+      animation:arrive .28s linear both;
     }
 
-    .tagline {
-      margin-top: 2.4rem !important;
+    .soon{margin-top:3.2rem}
+
+    .soon h1{
+      margin:0 0 1rem;
+      font:inherit;
+      font-weight:700;
+      letter-spacing:.045em;
     }
 
-    .notify {
-      display: inline-block;
-      margin-top: 1.8rem;
-      color: inherit;
-      font-weight: 700;
-      text-decoration: none;
-      letter-spacing: .06em;
+    .soon p{margin:.3rem 0}
+    .tagline{margin-top:2.4rem!important}
+
+    .notify{
+      display:inline-block;
+      margin-top:1.8rem;
+      color:var(--ink);
+      font-weight:700;
+      letter-spacing:.06em;
+      text-decoration:none;
     }
 
     .notify:hover,
-    .notify:focus-visible {
-      text-decoration: underline;
-      text-underline-offset: 4px;
+    .notify:focus-visible{
+      color:var(--red);
+      text-decoration:underline;
+      text-underline-offset:4px;
     }
 
-    @keyframes blink {
-      0%, 48% { opacity: 1; }
-      49%, 100% { opacity: 0; }
+    .glitch{animation:glitch .16s linear 1}
+
+    @keyframes glitch{
+      0%{transform:none}
+      25%{transform:translate(-3px,1px)}
+      50%{transform:translate(3px,-1px)}
+      75%{transform:translate(-1px,0)}
+      100%{transform:none}
     }
 
-    @keyframes arrive {
-      0% { opacity: 0; transform: translateX(-2px); }
-      35% { opacity: .65; transform: translateX(2px); }
-      100% { opacity: 1; transform: translateX(0); }
+    @keyframes arrive{
+      0%{opacity:0;transform:translateX(-2px)}
+      35%{opacity:.65;transform:translateX(2px)}
+      100%{opacity:1;transform:none}
     }
 
-    .glitch {
-      animation: glitch .16s linear 1;
-    }
-
-    @keyframes glitch {
-      0%   { transform: translate(0); }
-      25%  { transform: translate(-3px, 1px); }
-      50%  { transform: translate(3px, -1px); }
-      75%  { transform: translate(-1px, 0); }
-      100% { transform: translate(0); }
-    }
-
-    @media (max-width: 520px) {
-      main {
-        place-items: start;
-        padding-top: 14svh;
+    @media(max-width:700px){
+      main{
+        place-items:start;
+        padding:12svh 24px 24px;
       }
 
-      .terminal {
-        font-size: 12px;
-        line-height: 1.6;
+      .terminal{
+        font-size:12px;
+        line-height:1.6;
       }
 
-      .brand {
-        margin-bottom: 1.7rem;
+      .brand{margin-bottom:1.7rem}
+      .meta,.welcome{margin-top:1.7rem}
+
+      .stamp{
+        width:112px;
       }
 
-      .meta,
-      .welcome {
-        margin-top: 1.7rem;
+      .stamp.first{
+        top:auto;
+        right:-4px;
+        bottom:4vh;
+      }
+
+      .stamp.second{
+        width:122px;
+        right:-3px;
+        bottom:4vh;
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{
+        animation-duration:.01ms!important;
+        transition-duration:.01ms!important;
       }
     }
   </style>
 </head>
 
 <body>
+  <!-- Keep logo.png in the same GitHub folder as index.html -->
+  <img id="logo-one" class="stamp first" src="logo.png" alt="WLAD">
+  <img id="logo-two" class="stamp second" src="logo.png" alt="WLAD">
+
   <main>
     <section class="terminal" aria-live="polite">
 
@@ -289,12 +292,12 @@
         <p class="line">SYSTEM INITIALIZING...</p>
         <p class="line">LOADING WLAD.WORLD</p>
 
-        <div class="loader-wrap" aria-label="Loading WLAD.WORLD">
-          <span id="bar" class="bar"><span id="bar-filled"></span><span id="bar-empty">░░░░░░░░░░░░░░░░░░░░</span></span>
+        <div class="loader-wrap">
+          <span id="bar" class="bar">░░░░░░░░░░░░░░░░░░░░</span>
           <span id="percent" class="percent">0%</span>
         </div>
 
-        <div id="after-load" class="reveal">
+        <div id="after-load" class="after-load">
           <div class="meta">
             <p class="line">&gt; LOCATION: <span id="location">UNKNOWN</span></p>
             <p class="line">&gt; STATUS: AMONG DEMONS</p>
@@ -318,8 +321,7 @@
 
           <p class="tagline">WE LIVE AMONG DEMONS™</p>
 
-          <!-- Replace # with your signup/newsletter destination when ready. -->
-          <a class="notify" href="#" id="notify">[ GET NOTIFIED ]</a>
+          <a id="notify" class="notify" href="#">[ GET NOTIFIED ]</a>
         </div>
       </div>
 
@@ -328,46 +330,42 @@
 
   <script>
     const bar = document.getElementById("bar");
-    const barFilled = document.getElementById("bar-filled");
-    const barEmpty = document.getElementById("bar-empty");
     const percent = document.getElementById("percent");
     const afterLoad = document.getElementById("after-load");
     const locationEl = document.getElementById("location");
     const enter = document.getElementById("enter");
     const firstScreen = document.getElementById("first-screen");
     const secondScreen = document.getElementById("second-screen");
+    const logoOne = document.getElementById("logo-one");
+    const logoTwo = document.getElementById("logo-two");
     const notify = document.getElementById("notify");
 
     const BAR_LENGTH = 20;
     const LOAD_TIME = 3800;
 
-    function drawBar(progress) {
+    function drawBar(progress){
       const filled = Math.round((progress / 100) * BAR_LENGTH);
-      const empty = BAR_LENGTH - filled;
-      barFilled.textContent = "█".repeat(filled);
-      barEmpty.textContent = "░".repeat(empty);
+      bar.textContent =
+        "█".repeat(filled) +
+        "░".repeat(BAR_LENGTH - filled);
+
       percent.textContent = progress + "%";
     }
 
-    function startLoader() {
+    function startLoader(){
       const started = performance.now();
 
-      function frame(now) {
-        const elapsed = now - started;
-        const raw = Math.min(elapsed / LOAD_TIME, 1);
+      function frame(now){
+        const raw = Math.min((now - started) / LOAD_TIME, 1);
+        let progress = Math.floor((1 - Math.pow(1 - raw, 2.2)) * 100);
 
-        // Smooth progression with a tiny terminal-like hesitation.
-        let eased = 1 - Math.pow(1 - raw, 2.2);
-        let value = Math.floor(eased * 100);
+        progress = raw < 1 ? Math.min(progress, 99) : 100;
 
-        if (raw < 1) value = Math.min(value, 99);
-        else value = 100;
+        drawBar(progress);
 
-        drawBar(value);
-
-        if (raw < 1) {
+        if(raw < 1){
           requestAnimationFrame(frame);
-        } else {
+        }else{
           finishLoading();
         }
       }
@@ -375,16 +373,12 @@
       requestAnimationFrame(frame);
     }
 
-    async function getApproximateLocation() {
+    async function getApproximateLocation(){
       /*
-        IP-based approximate location only.
-        No browser GPS permission is requested.
-
-        ipwho.is is used here as a lightweight demo endpoint.
-        For production, you can swap this for your preferred
-        geolocation provider or a Vercel serverless/edge solution.
+        Approximate IP-based city/country only.
+        No GPS/browser location permission is requested.
       */
-      try {
+      try{
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 1800);
 
@@ -395,32 +389,38 @@
 
         clearTimeout(timeout);
 
-        if (!response.ok) throw new Error("Location request failed");
+        if(!response.ok) throw new Error("Location failed");
 
         const data = await response.json();
 
-        if (!data.success) throw new Error("Location unavailable");
+        if(!data.success) throw new Error("Location unavailable");
 
-        const city = data.city ? String(data.city).trim() : "";
-        const country = data.country ? String(data.country).trim() : "";
+        const city = (data.city || "").trim();
+        const country = (data.country || "").trim();
 
-        if (city && country) return `${city.toUpperCase()}, ${country.toUpperCase()}`;
-        if (country) return country.toUpperCase();
+        if(city && country){
+          return `${city.toUpperCase()}, ${country.toUpperCase()}`;
+        }
 
-        return "UNKNOWN";
-      } catch (_) {
-        return "UNKNOWN";
-      }
+        if(country){
+          return country.toUpperCase();
+        }
+
+      }catch(error){}
+
+      return "UNKNOWN";
     }
 
-    async function finishLoading() {
+    async function finishLoading(){
       drawBar(100);
 
-      const detectedLocation = await getApproximateLocation();
-      locationEl.textContent = detectedLocation;
+      locationEl.textContent = await getApproximateLocation();
 
-      // Keep the completed loader visible and append the terminal output below it.
       afterLoad.classList.add("visible");
+
+      setTimeout(() => {
+        logoOne.classList.add("show");
+      }, 180);
     }
 
     enter.addEventListener("click", () => {
@@ -432,12 +432,18 @@
 
       setTimeout(() => {
         firstScreen.style.display = "none";
+        logoOne.style.display = "none";
+
         secondScreen.classList.add("active");
+
+        setTimeout(() => {
+          logoTwo.classList.add("show");
+        }, 180);
       }, 250);
     });
 
-    notify.addEventListener("click", (event) => {
-      if (notify.getAttribute("href") === "#") {
+    notify.addEventListener("click", event => {
+      if(notify.getAttribute("href") === "#"){
         event.preventDefault();
       }
     });
