@@ -148,6 +148,7 @@
       display:flex;
       justify-content:flex-start;
       align-items:flex-start;
+      padding-left:18px;
     }
 
     .wlad-logo{
@@ -253,6 +254,7 @@
 
       .logo-row{
         margin-top:1.35rem;
+        padding-left:12px;
       }
     }
 
@@ -405,7 +407,12 @@
       afterLoad.classList.add("visible");
     }
 
-    enter.addEventListener("click",()=>{
+    let hasEntered = false;
+
+    function enterSite(){
+      if(hasEntered || !afterLoad.classList.contains("visible")) return;
+      hasEntered = true;
+
       firstScreen.classList.add("glitch");
 
       setTimeout(()=>{
@@ -416,6 +423,15 @@
         firstScreen.style.display="none";
         secondScreen.classList.add("active");
       },250);
+    }
+
+    enter.addEventListener("click", enterSite);
+
+    document.addEventListener("keydown", event=>{
+      if(event.key === "Enter" && !hasEntered){
+        event.preventDefault();
+        enterSite();
+      }
     });
 
     notify.addEventListener("click",event=>{
