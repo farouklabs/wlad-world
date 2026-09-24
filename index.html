@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f1efe8" />
+  <meta name="robots" content="index,follow" />
+  <title>WLAD.WORLD</title>
+
+  <style>
+    :root {
+      --paper: #f1efe8;
+      --ink: #11110f;
+      --muted: #6f6d66;
+      --red: #a20d0d;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    body {
+      min-height: 100svh;
+      overflow: hidden;
+      font-family: "Courier New", Courier, monospace;
+      -webkit-font-smoothing: none;
+      text-rendering: geometricPrecision;
+    }
+
+    /* Very subtle aged/digital texture */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0,0,0,.035) 0px,
+          rgba(0,0,0,.035) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      mix-blend-mode: multiply;
+      z-index: 20;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .16;
+      background-image:
+        radial-gradient(rgba(0,0,0,.16) .55px, transparent .65px);
+      background-size: 5px 5px;
+      z-index: 19;
+    }
+
+    main {
+      min-height: 100svh;
+      width: 100%;
+      display: grid;
+      place-items: center;
+      padding: clamp(22px, 5vw, 72px);
+    }
+
+    .terminal {
+      width: min(760px, 100%);
+      font-size: clamp(13px, 1.55vw, 17px);
+      line-height: 1.55;
+      letter-spacing: .025em;
+    }
+
+    .brand {
+      margin: 0 0 2rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+
+    .line {
+      margin: 0;
+      min-height: 1.55em;
+    }
+
+    .loader-wrap {
+      margin-top: .05rem;
+      white-space: nowrap;
+      display: flex;
+      align-items: baseline;
+      gap: .65rem;
+      max-width: 100%;
+    }
+
+    .bar {
+      display: inline-block;
+      width: min(20ch, 52vw);
+      letter-spacing: 0;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    .percent {
+      display: inline-block;
+      min-width: 4ch;
+      text-align: right;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(3px);
+      transition: opacity .22s linear, transform .22s linear;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .meta {
+      margin-top: 2rem;
+    }
+
+    .welcome {
+      margin-top: 2rem;
+    }
+
+    .enter {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-weight: 700;
+      letter-spacing: .06em;
+      padding: 0;
+      margin-top: 1.65rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .enter::after {
+      content: "█";
+      margin-left: .55rem;
+      animation: blink .8s steps(1) infinite;
+      color: var(--red);
+    }
+
+    .enter:hover,
+    .enter:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .enter:focus-visible {
+      outline: 1px dashed var(--ink);
+      outline-offset: 7px;
+    }
+
+    .screen {
+      transition: opacity .16s linear, filter .16s linear;
+    }
+
+    .screen.exit {
+      opacity: 0;
+      filter: blur(2px);
+    }
+
+    #second-screen {
+      display: none;
+    }
+
+    #second-screen.active {
+      display: block;
+      animation: arrive .28s linear both;
+    }
+
+    .soon {
+      margin-top: 3.2rem;
+    }
+
+    .soon h1 {
+      font: inherit;
+      font-weight: 700;
+      margin: 0 0 1rem;
+      letter-spacing: .045em;
+    }
+
+    .soon p {
+      margin: .3rem 0;
+    }
+
+    .tagline {
+      margin-top: 2.4rem !important;
+    }
+
+    .notify {
+      display: inline-block;
+      margin-top: 1.8rem;
+      color: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: .06em;
+    }
+
+    .notify:hover,
+    .notify:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    @keyframes blink {
+      0%, 48% { opacity: 1; }
+      49%, 100% { opacity: 0; }
+    }
+
+    @keyframes arrive {
+      0% { opacity: 0; transform: translateX(-2px); }
+      35% { opacity: .65; transform: translateX(2px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    .glitch {
+      animation: glitch .16s linear 1;
+    }
+
+    @keyframes glitch {
+      0%   { transform: translate(0); }
+      25%  { transform: translate(-3px, 1px); }
+      50%  { transform: translate(3px, -1px); }
+      75%  { transform: translate(-1px, 0); }
+      100% { transform: translate(0); }
+    }
+
+    @media (max-width: 520px) {
+      main {
+        place-items: start;
+        padding-top: 14svh;
+      }
+
+      .terminal {
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .brand {
+        margin-bottom: 1.7rem;
+      }
+
+      .meta,
+      .welcome {
+        margin-top: 1.7rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <section class="terminal" aria-live="polite">
+
+      <div id="first-screen" class="screen">
+        <p class="brand">WLAD.WORLD © 2026</p>
+
+        <p class="line">SYSTEM INITIALIZING...</p>
+        <p class="line">LOADING WLAD.WORLD</p>
+
+        <div class="loader-wrap" aria-label="Loading WLAD.WORLD">
+          <span id="bar" class="bar">░░░░░░░░░░░░░░░░░░░░</span>
+          <span id="percent" class="percent">0%</span>
+        </div>
+
+        <div id="after-load" class="reveal">
+          <div class="meta">
+            <p class="line">&gt; LOCATION: <span id="location">UNKNOWN</span></p>
+            <p class="line">&gt; STATUS: AMONG DEMONS</p>
+          </div>
+
+          <div class="welcome">
+            <p class="line"><strong>WELCOME TO WLAD.WORLD</strong></p>
+            <p class="line">WE LIVE AMONG DEMONS.</p>
+          </div>
+
+          <button id="enter" class="enter" type="button">[ ENTER ]</button>
+        </div>
+      </div>
+
+      <div id="second-screen" class="screen">
+        <p class="brand">WLAD.WORLD / 2026</p>
+
+        <div class="soon">
+          <h1>THE WORLD ISN'T READY YET.</h1>
+          <p>COMING SOON.</p>
+
+          <p class="tagline">WE LIVE AMONG DEMONS™</p>
+
+          <!-- Replace # with your signup/newsletter destination when ready. -->
+          <a class="notify" href="#" id="notify">[ GET NOTIFIED ]</a>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    const bar = document.getElementById("bar");
+    const percent = document.getElementById("percent");
+    const afterLoad = document.getElementById("after-load");
+    const locationEl = document.getElementById("location");
+    const enter = document.getElementById("enter");
+    const firstScreen = document.getElementById("first-screen");
+    const secondScreen = document.getElementById("second-screen");
+    const notify = document.getElementById("notify");
+
+    const BAR_LENGTH = 20;
+    const LOAD_TIME = 3800;
+
+    function drawBar(progress) {
+      const filled = Math.round((progress / 100) * BAR_LENGTH);
+      const empty = BAR_LENGTH - filled;
+      bar.textContent = "█".repeat(filled) + "░".repeat(empty);
+      percent.textContent = progress + "%";
+    }
+
+    function startLoader() {
+      const started = performance.now();
+
+      function frame(now) {
+        const elapsed = now - started;
+        const raw = Math.min(elapsed / LOAD_TIME, 1);
+
+        // Smooth progression with a tiny terminal-like hesitation.
+        let eased = 1 - Math.pow(1 - raw, 2.2);
+        let value = Math.floor(eased * 100);
+
+        if (raw < 1) value = Math.min(value, 99);
+        else value = 100;
+
+        drawBar(value);
+
+        if (raw < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          finishLoading();
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    async function getApproximateLocation() {
+      /*
+        IP-based approximate location only.
+        No browser GPS permission is requested.
+
+        ipwho.is is used here as a lightweight demo endpoint.
+        For production, you can swap this for your preferred
+        geolocation provider or a Vercel serverless/edge solution.
+      */
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 1800);
+
+        const response = await fetch("https://ipwho.is/", {
+          signal: controller.signal,
+          cache: "no-store"
+        });
+
+        clearTimeout(timeout);
+
+        if (!response.ok) throw new Error("Location request failed");
+
+        const data = await response.json();
+
+        if (!data.success) throw new Error("Location unavailable");
+
+        const city = data.city ? String(data.city).trim() : "";
+        const country = data.country ? String(data.country).trim() : "";
+
+        if (city && country) return `${city.toUpperCase()}, ${country.toUpperCase()}`;
+        if (country) return country.toUpperCase();
+
+        return "UNKNOWN";
+      } catch (_) {
+        return "UNKNOWN";
+      }
+    }
+
+    async function finishLoading() {
+      drawBar(100);
+
+      const detectedLocation = await getApproximateLocation();
+      locationEl.textContent = detectedLocation;
+
+      // Keep the completed loader visible and append the terminal output below it.
+      afterLoad.classList.add("visible");
+    }
+
+    enter.addEventListener("click", () => {
+      firstScreen.classList.add("glitch");
+
+      setTimeout(() => {
+        firstScreen.classList.add("exit");
+      }, 90);
+
+      setTimeout(() => {
+        firstScreen.style.display = "none";
+        secondScreen.classList.add("active");
+      }, 250);
+    });
+
+    notify.addEventListener("click", (event) => {
+      if (notify.getAttribute("href") === "#") {
+        event.preventDefault();
+      }
+    });
+
+    startLoader();
+  </script>
+</body>
+</html>
